@@ -1,0 +1,91 @@
+namespace Lab_2
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+        }
+    }
+    public interface IAttacker
+    {
+        void Attack(GameObject target);
+    }
+    public interface IMoveable
+    {
+        void Move(int  x, int y);
+    }
+    public abstract class GameObject
+    {
+        private int id;
+        private string name;
+        private int x;
+        private int y;
+        protected GameObject(int id, string name, int x, int y)
+        {
+            this.id = id;
+            this.name = name;
+            this.x = x;
+            this.y = y;
+        }
+        protected void SetLocation(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
+        }
+        public int GetId() => id;
+        public string GetName() => name;
+        public int GetX() => x;
+        public int GetY() => y;
+    }
+    public abstract class Building : GameObject
+    {
+        private bool isBuilt;
+        protected Building(int id, string name, int x, int y, bool isBuilt) : base(id, name, x, y)
+        {
+            this.isBuilt = isBuilt;
+        }
+
+        public bool IsBuilt => isBuilt;
+    }
+    public abstract class Unit : GameObject
+    {
+        private bool isAlive;
+        private float hp;
+        protected virtual void recieveDamage(float damage)
+        {
+            if (!isAlive) return;
+            hp-= damage;
+            if (hp <= 0)
+            {
+                hp = 0;
+                isAlive = false;
+            }
+        }
+        protected Unit(int id, string name, int x, int y, float maxHp) : base(id,name, x, y)
+        {
+            this.hp = maxHp;
+            this.isAlive = maxHp > 0;
+        }
+
+        public bool IsBuilt => isAlive;
+        public float GetHp() => hp;
+    }
+
+    public class Archer : Unit, IAttacker, IMoveable
+    {
+        public Archer(int id, string name, int x, int y, float hp) : base(id, name, x, y, hp) { }
+        public void Attack(GameObject target) { }
+        public void Move(int x, int y) { }
+    }
+    public class Fort : Building, IAttacker
+    {
+        public Fort(int id, string name, int x, int y, bool isBuilt) : base(id, name, x, y, isBuilt) { }
+        public void Attack(GameObject target) { } 
+    }
+    public class MobileHome : Building, IMoveable
+    {
+        public MobileHome(int id, string name, int x, int y, bool isBuilt) : base(id, name, x, y, isBuilt) { }
+        public void Move(int x, int y) { }
+    }
+}
+
