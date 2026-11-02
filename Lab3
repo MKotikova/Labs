@@ -1,0 +1,215 @@
+using System.Runtime.CompilerServices;
+
+namespace lab_3
+{
+    internal class Program
+    {
+        public class Logger //Singleton - Logger один на всю программу
+        {
+            private static Logger instance;// Приватное статическое поле для хранения единственного экземпляра
+            private Logger()// Приватный конструктор класса, чтобы предотвратить создание экземпляров извне
+            {
+
+            }
+            public static Logger getInstance()
+            {
+                if (instance == null)//Если логгера не создано, он создается
+                {
+                    instance = new Logger();
+                }
+                return instance;
+            }
+        } 
+        //
+        interface NewUnit
+        {
+            void Unit();
+        }
+        class Elf : NewUnit
+        {
+            public void Unit()
+            {
+                Console.WriteLine("Создан юнит Эльф");
+            }
+        }
+        class Dwarf : NewUnit
+        {
+            public void Unit()
+            {
+                Console.WriteLine("Создан юнит Гном");
+            }
+        }
+        abstract class UnitFactory //Factory Method - создает разных юнитов для игры
+        {
+            public abstract NewUnit createUnit(); //Фабричный метод
+            public void UnitRace()
+            {
+                NewUnit newUnit = createUnit();
+                newUnit.Unit(); //вызов метода
+            }
+        }
+        class ElfFactory : UnitFactory// Конкретная фабрика для создания Эльфов
+        {
+            public override NewUnit createUnit()
+            {
+                return new Elf();
+            }
+        }
+        class DwarfFactory : UnitFactory// Конкретная фабрика для создания Гномов
+        {
+            public override NewUnit createUnit()
+            {
+                return new Dwarf();
+            }
+        }
+        //
+        interface Helmet
+        {
+            void add();
+        }
+        class ElfHelmet : Helmet
+        {
+            public void add()
+            {
+                Console.WriteLine("Герою эльфу добавлен шлем");
+            }
+        }
+        class DwarfHelmet : Helmet
+        {
+            public void add()
+            {
+                Console.WriteLine("Герою гному добавлен шлем");
+            }
+        }
+        interface Weapon
+        {
+            void add();
+        }
+        class Bow : Weapon
+        {
+            public void add()
+            {
+                Console.WriteLine("Герою добавлен лук");
+            }
+        }
+        class Hammer : Weapon
+        {
+            public void add()
+            {
+                Console.WriteLine("Герою добавлен молот");
+            }
+        }
+        interface Gear //абстрактная фабрика снаряжения
+        {
+            Helmet addHelmet();
+            Weapon addWeapon();
+        }
+        class ElfGear : Gear//Конкретная фабрика снаряжения эльфа
+        {
+            public Helmet addHelmet()
+            {
+                return new ElfHelmet();
+            }
+            public Weapon addWeapon()
+            {
+                return new Bow();
+            }
+        }
+        class DwarfGear : Gear //Конкретная фабрика снаряжения гнома
+        {
+            public Helmet addHelmet()
+            {
+                return new DwarfHelmet();
+            }
+            public Weapon addWeapon()
+            {
+                return new Hammer();
+            }
+        }
+        class ReadyToFight
+        {
+            private Helmet helmet;
+            private Weapon weapon;
+            public ReadyToFight(Gear factory)
+            {
+                helmet = factory.addHelmet();
+                weapon = factory.addWeapon();
+            }
+            public void add()
+            {
+                helmet.add();
+                weapon.add();
+            }
+        }
+        //
+        class Fortress //Builder
+        {
+            private string townhall;
+            private string unitBuilding;
+            private string tavern;
+            public void setTownhall(string townhall)
+            {
+                this.townhall = townhall;
+            }
+            public void setUnitBuilding(string unitBuilding)
+            {
+                this.unitBuilding = unitBuilding;
+            }
+            public void setTavern(string tavern)
+            {
+                this.tavern = tavern;
+            } 
+        }
+        interface FortressBuilder
+        {
+            void buildTownhall();
+            void buildUnitBuilding();
+            void buildTavern();
+            Fortress getResult();
+        }
+        class MountainFortress : FortressBuilder
+        {
+            private Fortress fortress;
+            public MountainFortress()
+            {
+                this.fortress = new Fortress();
+            }
+            public void buildTownhall()
+            {
+                fortress.setTownhall("Mountain design");
+            }
+            public void buildUnitBuilding()
+            {
+                fortress.setUnitBuilding("Mountain design");
+            }
+            public void buildTavern()
+            {
+                fortress.setTavern("Mountain design");
+            }
+            public Fortress getResult()
+            {
+                return this.fortress;
+            }
+        }
+        class FortresssDirector
+        {
+            private FortressBuilder builder;
+            public FortresssDirector(FortressBuilder builder)
+            {
+                this.builder = builder;
+            }
+            public void constructFortress()
+            {
+                builder.buildTownhall();
+                builder.buildUnitBuilding();
+                builder.buildTavern();
+            }
+        }
+        //
+        static void Main(string[] args)
+        {
+            UnitFactory elfFactory = new ElfFactory();
+            elfFactory.UnitRace();
+        }
+    }
+}
