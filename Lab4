@@ -1,0 +1,125 @@
+using System.Threading.Channels;
+
+namespace Lab4
+{
+    //Стратегия - построение пути
+    public interface Path
+    {
+        void setPath(int lengh);
+    }
+    class byFeet : Path
+    {
+        public void setPath(int length)
+        {
+            Console.WriteLine("Chosen path is by feet");
+        }
+    }
+    class byCar : Path
+    {
+        public void setPath(int length)
+        {
+            Console.WriteLine("Chosen path is by car");
+        }
+    }
+    class Navigator
+    {
+        private Path path;
+        public void setStrategy(Path path)
+        {
+            this.path = path;
+        }
+        public void findPath(int length)
+        {
+            path.setPath(length);
+        }
+    }
+    //Цепочка обязанностей - техподдержка
+    interface Handler
+    {
+        void handleRequest(string request);
+        void setNextHandler(Handler nextHandler);
+    }
+    class RobotHandler : Handler
+    {
+        private Handler nextHandler;
+        public void handleRequest(string request)
+        {
+           if(request == "Change visit time")
+            {
+                Console.WriteLine("Your time is changed. We look forward to seeing you!");
+            }
+            else
+            {
+                nextHandler.handleRequest(request); 
+            }
+        }
+        public void setNextHandler(Handler nextHandler)
+        {
+            this.nextHandler = nextHandler;
+        }
+    }
+    class HumanHandler : Handler
+    {
+        private Handler nextHandler;
+        public void handleRequest(string request)
+        {
+            if (request == "I WANT TO TALK TO A HUMAN!!!")
+            {
+                Console.WriteLine("A human worker will answer you soon");
+            }
+            else
+            {
+                nextHandler.handleRequest(request);
+            }
+        }
+        public void setNextHandler(Handler nextHandler)
+        {
+            this.nextHandler = nextHandler;
+        }
+    }
+    //
+    interface Iterator<T>
+    {
+        bool HasNext();
+        T Next();
+    }
+    class PlayListIterator<T> : Iterator<T>
+    {
+        private T[] items;
+        private int position;
+        public PlayListIterator(T[] items)
+        {
+            this.items = items;
+            this.position = 0;
+        }
+        public bool HasNext()
+        {
+            return position < items.Length;
+        }
+        public T Next()
+        {
+            if (!this.HasNext())
+            {
+                throw new InvalidOperationException("Коллекция закончилась.");
+            }
+            return items[position++];
+        }
+    }
+    //
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            //Стратегия
+            Navigator navigator = new Navigator();
+            navigator.setStrategy(new byFeet());
+            navigator.findPath(10);
+            //Цепочка обязанностей
+            Handler handlerRobot = new RobotHandler();
+            Handler handlerHuman = new HumanHandler();
+            handlerRobot.setNextHandler(handlerHuman);
+            string request = "I WANT TO TALK TO A HUMAN!!!";
+            handlerRobot.handleRequest(request);
+        }
+    }
+}
